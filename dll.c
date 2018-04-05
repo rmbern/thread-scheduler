@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef enum direction {NEXT, PREV} direction;
+
 typedef struct dll
 {	
 	struct dll_node * head;
@@ -14,6 +16,7 @@ typedef struct dll_node
 	int data;
 
 } dll_node;
+
 
 dll * dll_init(int data)
 {
@@ -116,38 +119,57 @@ void dll_remove_node(dll * list, dll_node * node)
 	return;
 }
 
+void dll_print(dll * list, int hops, direction dir)
+{
+	dll_node * traversal = list->head;
+	for(int i = 0; i < hops; i++)
+	{
+		if (traversal == list->head) // about to print the head
+		{
+			printf("|%d| ", traversal->data);
+		}
+		else //not about to print the head
+		{
+			printf("<%d> ", traversal->data);
+		}
+
+		if(dir == NEXT)
+		{
+			traversal = traversal->next;
+		}
+		else if (dir == PREV)
+		{
+			traversal = traversal->prev;
+		}
+		else
+		{
+			printf("BAD DIRECTION GIVEN TO DLL PRINTER :(\n");
+			return;
+		}
+	}
+	printf("\n");
+	return;
+}
+
 int main()
 {
 	dll * test_dll = dll_init(0);
-	int i = 20;
 
+	int i = 20;
 	while(i --> 0) // i approaches 0
 	{	
 		dll_add_node(test_dll, i + 70);
 	}
 	
 	printf("TRAVERSING VIA NEXT:\n");
-	i = 40;
-	dll_node * traversal = test_dll->head;
-	while(i --> 0) // i approaches 0
-	{
-		traversal = traversal->next;
-		printf("%d, %d\n", i, traversal->data);	
-	}
-	printf("\n");
+	dll_print(test_dll, 40, NEXT);
 
 	printf("TRAVERSING VIA PREV:\n");
-	i = 40;
-	traversal = test_dll->head;
-	while(i --> 0) // i approaches 0
-	{
-		traversal = traversal->prev;
-		printf("%d, %d\n", i, traversal->data);	
-	}
-	printf("\n");
+	dll_print(test_dll, 40, PREV);
 
 	printf("REMOVING NODES:\n");
 	i = 10;
+	dll_node * traversal;
 	while(i --> 0) // i approaches 0
 	{
 		traversal = test_dll->head;
@@ -156,22 +178,10 @@ int main()
 	printf("\n");
 
 	printf("TRAVERSING VIA NEXT:\n");
-	i = 20;	
-	traversal = test_dll->head;
-	while(i --> 0) // i approaches 0
-	{
-		traversal = traversal->next;
-		printf("%d, %d\n", i, traversal->data);
-	}
+	dll_print(test_dll, 40, NEXT);
 
 	printf("TRAVERSING VIA PREV:\n");
-	i = 20;	
-	traversal = test_dll->head;
-	while(i --> 0) // i approaches 0
-	{
-		traversal = traversal->prev;
-		printf("%d, %d\n", i, traversal->data);
-	}
+	dll_print(test_dll, 40, PREV);
 
 	return 0;
 
