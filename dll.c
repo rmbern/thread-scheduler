@@ -36,7 +36,7 @@ dll * dll_init(int data)
 }
 
 // TODO: ERRORS in retval
-void dll_new_node(dll * list, int data)
+void dll_add_node(dll * list, int data)
 {	
 	dll_node * new = malloc(sizeof(dll_node));
 	new->data = data;
@@ -83,6 +83,39 @@ void dll_new_node(dll * list, int data)
 	return;
 }
 
+void dll_remove_node(dll * list, dll_node * node)
+{
+	// removes the dll_node given by the node pointer
+	// from the given dll.
+
+	//////////////////////////////////////////////////////
+	// First, if we are about to remove the head,
+	// make sure designate a new node as the head.
+	if (list->head = node)
+	{
+		// selection of node->next for the
+		// new head is essentially arbitrary.
+		list->head = node->next;
+	}	
+	//////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////
+	// take the node ahead of our given node, and make
+	// it point to the node behind our given node.
+	node->next->prev = node->prev;
+	//////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////
+	// take the node behind our given node, and make
+	// it point the the node ahead of our given node.
+	node->prev->next = node->next;
+	//////////////////////////////////////////////////////
+
+	free(node);
+
+	return;
+}
+
 int main()
 {
 	dll * test_dll = dll_init(0);
@@ -90,9 +123,10 @@ int main()
 
 	while(i --> 0) // i approaches 0
 	{	
-		dll_new_node(test_dll, i + 70);
+		dll_add_node(test_dll, i + 70);
 	}
 	
+	printf("TRAVERSING VIA NEXT:\n");
 	i = 40;
 	dll_node * traversal = test_dll->head;
 	while(i --> 0) // i approaches 0
@@ -100,7 +134,9 @@ int main()
 		traversal = traversal->next;
 		printf("%d, %d\n", i, traversal->data);	
 	}
+	printf("\n");
 
+	printf("TRAVERSING VIA PREV:\n");
 	i = 40;
 	traversal = test_dll->head;
 	while(i --> 0) // i approaches 0
@@ -108,7 +144,35 @@ int main()
 		traversal = traversal->prev;
 		printf("%d, %d\n", i, traversal->data);	
 	}
-	
+	printf("\n");
+
+	printf("REMOVING NODES:\n");
+	i = 10;
+	while(i --> 0) // i approaches 0
+	{
+		traversal = test_dll->head;
+		dll_remove_node(test_dll, traversal);
+	}
+	printf("\n");
+
+	printf("TRAVERSING VIA NEXT:\n");
+	i = 20;	
+	traversal = test_dll->head;
+	while(i --> 0) // i approaches 0
+	{
+		traversal = traversal->next;
+		printf("%d, %d\n", i, traversal->data);
+	}
+
+	printf("TRAVERSING VIA PREV:\n");
+	i = 20;	
+	traversal = test_dll->head;
+	while(i --> 0) // i approaches 0
+	{
+		traversal = traversal->prev;
+		printf("%d, %d\n", i, traversal->data);
+	}
+
 	return 0;
 
 }
