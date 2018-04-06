@@ -150,39 +150,3 @@ void dll_print(dll * list, int hops, direction dir)
 	printf("\n");
 	return;
 }
-
-int main()
-{
-	dll * test_dll = dll_init(0);
-
-	int i = 20;
-	while(i --> 0) // i approaches 0
-	{	
-		dll_add_node(test_dll, i + 70);
-	}
-	
-	printf("TRAVERSING VIA NEXT:\n");
-	dll_print(test_dll, 40, NEXT);
-
-	printf("TRAVERSING VIA PREV:\n");
-	dll_print(test_dll, 40, PREV);
-
-	printf("REMOVING NODES:\n");
-	i = 10;
-	dll_node * traversal;
-	while(i --> 0) // i approaches 0
-	{
-		traversal = test_dll->head;
-		dll_remove_node(test_dll, traversal);
-	}
-	printf("\n");
-
-	printf("TRAVERSING VIA NEXT:\n");
-	dll_print(test_dll, 40, NEXT);
-
-	printf("TRAVERSING VIA PREV:\n");
-	dll_print(test_dll, 40, PREV);
-
-	return 0;
-
-}
