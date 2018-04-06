@@ -15,6 +15,7 @@ typedef struct dll_node
 } dll_node;
 
 dll * dll_init(int data);
+int dll_is_size_one(dll * list);
 void dll_add_node(dll * list, int data);
 void dll_remove_node(dll * list, dll_node * node);
 void dll_print(dll * list, int hops, direction dir);

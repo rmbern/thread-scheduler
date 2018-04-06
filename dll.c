@@ -17,6 +17,10 @@ typedef struct dll_node
 
 } dll_node;
 
+int dll_is_size_one(dll * list)
+{
+	return (list->head == list->head->next);
+}
 
 dll * dll_init(int data)
 {
@@ -68,9 +72,7 @@ void dll_add_node(dll * list, int data)
 	
 	//////////////////////////////////////////////////////
 	// Check if dll has just been initialized...
-	// (remember we connect the next and last
-	//  of a size one dll back to itself!!)
-	if(list->head->next == list->head)
+	if(dll_is_size_one(list))
 	{
 		// ...and start the circuluar queue if it has!!!
 		list->head->next = new;
