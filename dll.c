@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ucontext.h>
 
 typedef enum direction {NEXT, PREV} direction;
 
@@ -13,6 +14,7 @@ typedef struct dll_node
 {
 	struct dll_node * next;
 	struct dll_node * prev;
+  ucontext_t * context;
 	int data;
 
 } dll_node;
@@ -26,8 +28,8 @@ dll * dll_init(int data)
 {
 	// Returns a pointer to a single node linked list.
 	//
-	dll * new_dll = malloc(sizeof(dll));
-
+  dll * new_dll;
+	new_dll = malloc(sizeof(dll));
 	new_dll->head = malloc(sizeof(dll_node));
 	
 	// Link the pointers of the dll back to itself
@@ -37,16 +39,16 @@ dll * dll_init(int data)
 	new_dll->head->prev = new_dll->head;
 
 	new_dll->head->data = data;
-
-	return new_dll;
-
+  new_dll->head->context = malloc(sizeof(ucontext_t));
+  getcontext(new_dll->head->context);
+  return new_dll;
 }
 
 // TODO: ERRORS in retval
-void dll_add_node(dll * list, int data)
+void dll_add_thread(dll * list, ucontext_t context, void (*func)(void), 
+int data)
 {	
 	dll_node * new = malloc(sizeof(dll_node));
-	new->data = data;
 	
 	// the node directly behind the head is always
 	// the tail (since the dll is circular).
@@ -84,6 +86,16 @@ void dll_add_node(dll * list, int data)
 	// completing the circle!
 	old_tail->next = new;
 	//////////////////////////////////////////////////////
+
+  // BEGIN THREAD LOADING
+	new->data = data;
+  new->context = malloc(sizeof(ucontext_t));
+  *(new->context) = context;
+  getcontext(new->context);
+  new->context->uc_stack.ss_sp = malloc(100000); // currently LEAKS
+  new->context->uc_stack.ss_size = 100000;
+  makecontext(new->context, func, 0);
+  // END THREAD LOADING
 
 	return;
 }
@@ -123,6 +135,7 @@ void dll_remove_node(dll * list, dll_node * node)
 
 void dll_print(dll * list, int hops, direction dir)
 {
+  printf("DLL PRINT\n");
 	dll_node * traversal = list->head;
 	for(int i = 0; i < hops; i++)
 	{
