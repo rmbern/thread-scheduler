@@ -1,69 +1,48 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <signal.h>
+#include <unistd.h>
 #include <ucontext.h>
-#include "dll.h"
+#include "thread.h"
 
-dll * G_DLL_SCHED;
-
-void sig_handler(int signo)
+void new_thread(void * args)
 {
-  if (signo != SIGALRM)
+  int val = *(int*)args;
+  free(args);
+  while(1)
   {
-    printf("Wow! You really fucked up your signal handling!\n");
-    exit(1);
-  }
-
-  alarm(2);
-
-  if(dll_is_size_one(G_DLL_SCHED))
-  {
-    printf("No threads to schedule!\n");
-  }
-  else
-  {
-    G_DLL_SCHED->head = G_DLL_SCHED->head->next;
-    swapcontext(G_DLL_SCHED->head->prev->context, G_DLL_SCHED->head->context);
+    printf("I AM A NEW THREAD!\n");
+    printf("MY ARG IS %d\n", val);
+    sleep(1);
+    thread_yield();
   }
 }
 
-void new_thread()
+void newer_thread(void * args)
 {
+  int val = *(int*)args;
+  free(args);
   while(1)
   {
-    printf("I AM A NEW THREAD MOTHERFUCKER!\n");
+    printf("I AM A NEWER THREAD!\n");
+    printf("MY ARG IS %d\n", val);
     sleep(1);
-  }
-}
-
-void newer_thread()
-{
-  while(1)
-  {
-    printf("I AM A NEWER THREAD MOTHERFUCKER!\n");
-    sleep(1);
+    thread_exit();
   }
 }
 
 int main()
 {
-  G_DLL_SCHED = dll_init(0);
-  
-  struct sigaction action;
-  action.sa_flags = 0;
-  action.sa_handler = sig_handler;
-  sigemptyset(&action.sa_mask);
-  sigaction(SIGALRM, &action, 0);
-  alarm(2);
-
   ucontext_t thread;
   ucontext_t newerthread;
-  dll_add_thread(G_DLL_SCHED, thread, new_thread, 1);
-  dll_add_thread(G_DLL_SCHED, newerthread, newer_thread, 2);
+  int * val1 = malloc(sizeof(val1));
+  *val1 = 1;
+  int * val2 = malloc(sizeof(val2));
+  *val2 = 2;
+  thread_create(thread, new_thread, (void*)val1);
+  thread_create(newerthread, newer_thread, (void*)val2);
   while(1)
   {
-    printf("I AM THE MAIN THREAD MOTHERFUCKER!\n");
+    printf("I AM THE MAIN THREAD!\n");
     sleep(1);
   }
 	return 0;
