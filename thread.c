@@ -56,6 +56,7 @@ void dll_remove_node(dll_node * node)
 	// it point the the node ahead of our given node.
 	node->prev->next = node->next;
 	//////////////////////////////////////////////////////
+  free(node->context->uc_stack.ss_sp);
   free(node->context);
 	free(node);
 
@@ -223,7 +224,7 @@ void thread_create(ucontext_t context, void (*func)(void *), void * args)
   new->context = malloc(sizeof(ucontext_t));
   *(new->context) = context;
   getcontext(new->context);
-  new->context->uc_stack.ss_sp = malloc(100000); // currently LEAKS
+  new->context->uc_stack.ss_sp = malloc(100000);
   new->context->uc_stack.ss_size = 100000;
   new->is_done_running = 0;
   makecontext(new->context,(void(*)(void))func, 1, args);
